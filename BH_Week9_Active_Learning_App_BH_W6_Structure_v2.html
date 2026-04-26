@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BH Week 9 Active Learning App · BH_W6 Structure · EN/KO</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f0;--card:#fff;--muted:#f0ede6;--ink:#1a1814;--ink2:#5a5650;--ink3:#8f8a84;
+  --line:rgba(26,24,20,.12);--blue:#2a4a8a;--blueLite:#e8edf8;--green:#2a6a4a;--greenLite:#e8f5ee;
+  --gold:#b07830;--goldLite:#fdf3e3;--purple:#5a2a8a;--purpleLite:#f0e8f8;--red:#8a2a2a;--redLite:#fceaea;
+  --radius:12px;--shadow:0 10px 25px rgba(26,24,20,.06);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.7 'DM Sans',sans-serif}
+button,input,textarea,select{font:inherit}
+.header{position:sticky;top:0;z-index:50;background:var(--ink);color:#f7f5f0;border-bottom:1px solid rgba(255,255,255,.08)}
+.header-inner{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand-title{font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700}
+.brand-sub{font-size:11px;color:rgba(247,245,240,.58)}
+.langs{display:flex;gap:6px}
+.lang-btn{border:1px solid rgba(247,245,240,.22);background:rgba(247,245,240,.08);color:#f7f5f0;padding:6px 10px;border-radius:8px;cursor:pointer}
+.lang-btn.active{background:rgba(247,245,240,.22)}
+.topbar{position:sticky;top:58px;z-index:45;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow:auto}
+.tab-btn{background:none;border:none;padding:11px 12px;color:var(--ink2);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 36px}
+.hero{background:linear-gradient(135deg,#171512,#2a4a8a);color:#f7f5f0;border-radius:18px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(247,245,240,.58);margin-bottom:4px}
+.hero h1{margin:0 0 6px;font:700 26px/1.25 'Libre Baskerville',serif}
+.hero p{margin:0;color:rgba(247,245,240,.82);max-width:920px}
+.panel{display:none}
+.panel.active{display:block}
+.grid-2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card-head{padding:14px 16px;border-bottom:1px solid var(--line);background:var(--muted)}
+.card-body{padding:16px}
+.kicker{font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink3);font-weight:700;margin-bottom:3px}
+.card-title{font:700 16px/1.35 'Libre Baskerville',serif;margin:0}
+.card p{margin:0 0 10px}
+.note{background:var(--goldLite);border:1px solid rgba(176,120,48,.22);border-radius:10px;padding:11px 12px;color:var(--ink2)}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.ctrl{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:9px;cursor:pointer}
+.ctrl.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.ctrl.warn{background:var(--redLite);border-color:rgba(138,42,42,.18);color:var(--red)}
+.session-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.text-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.text-top{padding:16px 16px 14px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fff,#f9f7f2)}
+.ref{display:inline-flex;align-items:center;gap:6px;background:var(--blueLite);color:var(--blue);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;margin-bottom:8px}
+.text-title{font:700 18px/1.35 'Libre Baskerville',serif;margin:0 0 6px}
+.text-desc{color:var(--ink2);font-size:13px}
+.ctx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 0}
+.ctx{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--muted)}
+.ctx .label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--ink3);margin-bottom:4px}
+.ctx .value{font-size:12.5px;color:var(--ink)}
+.text-body{padding:15px 16px 16px}
+.workflow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.step{padding:7px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--line);background:#fff}
+.step.exe{background:var(--blueLite);color:var(--blue);border-color:rgba(42,74,138,.18)}
+.step.her{background:var(--greenLite);color:var(--green);border-color:rgba(42,106,74,.18)}
+.step.int{background:var(--purpleLite);color:var(--purple);border-color:rgba(90,42,138,.16)}
+.question{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.question:last-child{margin-bottom:0}
+.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:7px}
+.qtype{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.qtype.exe{background:var(--blueLite);color:var(--blue)}
+.qtype.her{background:var(--greenLite);color:var(--green)}
+.qfocus{font-size:11px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.qtext{font-size:13.5px;color:var(--ink);margin-bottom:7px}
+.qguide{font-size:12px;color:var(--ink2);background:var(--muted);border-radius:8px;padding:8px 9px;margin-bottom:8px}
+textarea.answer{width:100%;min-height:92px;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fcfbf8;color:var(--ink)}
+textarea.answer:focus{outline:2px solid rgba(42,74,138,.13);border-color:rgba(42,74,138,.28)}
+.integration{margin-top:12px;padding:12px;border-radius:12px;background:var(--purpleLite);border:1px solid rgba(90,42,138,.16)}
+.integration .ititle{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:6px}
+.integration textarea{background:#fff}
+.progress-shell{height:12px;background:var(--muted);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),#5a2a8a)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{background:var(--muted);border-radius:12px;padding:12px;border:1px solid var(--line)}
+.stat-num{font:700 22px/1 'Libre Baskerville',serif;margin-bottom:4px}
+.stat-label{font-size:12px;color:var(--ink2)}
+.mini-list{display:grid;gap:10px}
+.mini{padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.mini-title{font-weight:700;color:var(--ink);margin-bottom:3px}
+.mini-desc{font-size:12.5px;color:var(--ink2)}
+.footer-note{margin-top:18px;color:var(--ink3);font-size:12px;text-align:center}
+
+.day-shell{display:grid;gap:14px}
+.day-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.day-subtab{background:#fff;border:1px solid var(--line);color:var(--ink2);padding:9px 12px;border-radius:10px;cursor:pointer;font-weight:700;box-shadow:var(--shadow)}
+.day-subtab.active{background:var(--blueLite);color:var(--blue);border-color:rgba(42,74,138,.22)}
+.day-subpanel{display:none}
+.day-subpanel.active{display:block}
+.day-subpanel .text-card{margin-top:2px}
+.subtab-note{font-size:12.5px;color:var(--ink2);margin:0 0 12px;line-height:1.65}
+
+.student-guide{margin-bottom:14px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#fff,#f8f5ef);overflow:hidden}
+.sg-head{padding:13px 14px;border-bottom:1px solid var(--line);background:var(--muted)}
+.sg-title{font:700 15px/1.35 'Libre Baskerville',serif;margin:0 0 4px;color:var(--ink)}
+.sg-sub{font-size:12px;color:var(--ink2);line-height:1.6}
+.sg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:14px}
+.sg-box{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.sg-box.full{grid-column:1/-1}
+.sg-label{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--ink3);margin-bottom:5px}
+.sg-box-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:5px;line-height:1.45}
+.sg-text{font-size:12.5px;color:var(--ink2);line-height:1.65}
+.sg-list{margin:0;padding-left:18px}
+.sg-list li{font-size:12.5px;color:var(--ink2);line-height:1.65;margin-bottom:4px}
+.sg-callout{border-radius:12px;padding:12px 13px;margin:12px 14px 0;border:1px solid rgba(90,42,138,.16);background:var(--purpleLite)}
+.sg-callout.red{background:var(--redLite);border-color:rgba(138,42,42,.18)}
+.sg-callout.gold{background:var(--goldLite);border-color:rgba(176,120,48,.22)}
+.sg-callout .sg-label{color:var(--purple)}
+.sg-callout.red .sg-label{color:var(--red)}
+.sg-callout.gold .sg-label{color:var(--gold)}
+textarea.guide-answer{width:100%;min-height:78px;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fcfbf8;color:var(--ink);margin-top:8px}
+textarea.guide-answer:focus{outline:2px solid rgba(42,74,138,.13);border-color:rgba(42,74,138,.28)}
+.sg-pill-row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+.sg-pill{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid var(--line);background:var(--surface2);color:var(--ink2)}
+.sg-pill.blue{background:var(--blueLite);color:var(--blue);border-color:rgba(42,74,138,.18)}
+.sg-pill.green{background:var(--greenLite);color:var(--green);border-color:rgba(42,106,74,.18)}
+.sg-pill.gold{background:var(--goldLite);color:var(--gold);border-color:rgba(176,120,48,.18)}
+.sg-pill.purple{background:var(--purpleLite);color:var(--purple);border-color:rgba(90,42,138,.16)}
+.toggle-stack{display:grid;gap:10px}
+.toggle-section{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+.toggle-section summary{list-style:none;cursor:pointer;padding:13px 15px;background:linear-gradient(180deg,#fff,#f9f7f2);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.toggle-section summary::-webkit-details-marker{display:none}
+.toggle-kicker{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);font-weight:700;margin-bottom:3px}
+.toggle-title{font:700 15px/1.35 'Libre Baskerville',serif;color:var(--ink);margin:0}
+.toggle-summary-text{font-size:12px;color:var(--ink2);margin-top:3px}
+.toggle-arrow{font-size:16px;color:var(--ink3);transition:transform .2s ease;flex-shrink:0}
+.toggle-section[open] .toggle-arrow{transform:rotate(180deg)}
+.toggle-body{padding:14px 15px;border-top:1px solid var(--line);background:#fff}
+.section-note{font-size:12.5px;color:var(--ink2);margin-bottom:10px;line-height:1.65}
+
+@media (max-width:1050px){
+  .session-grid{grid-template-columns:1fr}
+  .grid-2{grid-template-columns:1fr}
+  .sg-grid{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .ctx-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .header-inner{align-items:flex-start;flex-direction:column}
+  .topbar{top:74px}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <div class="brand-title" id="brandTitle"></div>
+      <div class="brand-sub" id="brandSub"></div>
+    </div>
+    <div class="langs">
+      <button class="lang-btn active" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="ko">한국어</button>
+    </div>
+  </div>
+</header>
+<nav class="topbar">
+  <div class="topbar-inner" id="tabs"></div>
+</nav>
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow" id="heroEyebrow"></div>
+    <h1 id="heroTitle"></h1>
+    <p id="heroText"></p>
+  </section>
+
+  <section class="panel active" id="panel-overview"></section>
+  <section class="panel" id="panel-tuesday"></section>
+  <section class="panel" id="panel-friday"></section>
+  <section class="panel" id="panel-workspace"></section>
+
+  <div class="footer-note" id="footerNote"></div>
+</main>
+
+<script>
+const ui = {
+  "en": {
+    "brandTitle": "Biblical Hermeneutics — Week 9 Active Learning App",
+    "brandSub": "GEK20070-01 · Fee & Stuart + Osborne · Student-Only In-Class Learning",
+    "heroEyebrow": "Week 9 Active Learning · BH_W6 Structure",
+    "heroTitle": "Gospels, Lament, and Intertextual Interpretation",
+    "heroText": "This Week 9 in-class app converts the Fee & Stuart + Osborne synthesis into collaborative interpretation. Students work through three core texts on Tuesday and three core texts on Friday. Each text has exactly one exegetical question and one hermeneutical question, with historical, literary, and cultural context, student guide prompts, autosaved notes, and a final group synthesis sentence.",
+    "tabs": {
+      "overview": "Overview",
+      "tuesday": "Tuesday",
+      "friday": "Friday",
+      "workspace": "Workspace"
+    },
+    "overview": {
+      "flowTitle": "How to Use This App in Class",
+      "flowSub": "A student-only Tuesday/Friday workflow for moving from textual observation to responsible hermeneutical formation",
+      "flowItems": [
+        [
+          "Step 1",
+          "Read the assigned core text aloud and identify the historical, literary, and cultural cues before discussing application."
+        ],
+        [
+          "Step 2",
+          "Answer the single exegetical question first. Stay inside the text world and use the method named in the source manuscripts: two-level Gospel reading, narrative criticism, Hebrew poetry, or intertextual reading."
+        ],
+        [
+          "Step 3",
+          "Answer the single hermeneutical question second. Move from textual meaning toward community formation without bypassing the form of the text."
+        ],
+        [
+          "Step 4",
+          "Write one group synthesis sentence that names WHERE the interpretive field opens, WHO is being formed, and WHAT faithful practice follows."
+        ]
+      ],
+      "rightTitle": "Session Design",
+      "rightSub": "Three core texts on Tuesday, three core texts on Friday",
+      "day1": "Tuesday texts: Luke 15:1–2; Luke 15:11–24; Luke 15:25–32",
+      "day2": "Friday texts: Psalm 22:1–11; Psalm 22:12–24; Mark 15:33–39",
+      "note": "All student writing autosaves in this browser. Use Export Notes at the end of class if you want a backup file.",
+      "toolsTitle": "What Each Text Card Includes",
+      "tools": [
+        [
+          "Historical context",
+          "The community, covenant, and social setting needed for responsible reading."
+        ],
+        [
+          "Literary context",
+          "Narrative frame, plot movement, implied reader, parallelism, lament structure, or intertextual citation."
+        ],
+        [
+          "Cultural context",
+          "Meal fellowship, honor/shame, inheritance, lament, communal suffering, empire, and public witness as relevant."
+        ],
+        [
+          "1 exegetical question",
+          "A question that keeps students inside the textual world before importing contemporary assumptions."
+        ],
+        [
+          "1 hermeneutical question",
+          "A question that bridges the textual claim into community formation and embodied discernment."
+        ]
+      ],
+      "progressTitle": "Class Progress",
+      "progressSub": "This updates as students type.",
+      "buttons": {
+        "export": "Export Notes",
+        "reset": "Reset All Notes"
+      }
+    },
+    "workspace": {
+      "title": "Shared Workspace",
+      "sub": "Use this section for final synthesis, plenary reporting, or instructor wrap-up.",
+      "prompt1": "Across Luke 15, Psalm 22, and Mark 15, how do proclamation-logic and presence-logic need each other?",
+      "prompt2": "Where did your group most clearly see the claim that form carries meaning rather than merely delivering detachable content?",
+      "prompt3": "What interpretive practice should change if we hold Fee & Stuart's two-level method together with Osborne's attention to narrative form, lament, and implied reader?"
+    },
+    "footer": "Built for Week 9 in-class active learning using the BH_W6 student-only structure. Notes remain in this browser unless you reset or clear storage.",
+    "labels": {
+      "workflowExe": "Exegetical",
+      "workflowHer": "Hermeneutical",
+      "workflowInt": "Integration",
+      "historical": "Historical Context",
+      "literary": "Literary Context",
+      "cultural": "Cultural Context",
+      "exe": "Exegetical Question",
+      "her": "Hermeneutical Question",
+      "answer": "Student Notes",
+      "guide": "Discussion cue",
+      "integration": "Synthesis / Group Integration",
+      "integrationPrompt": "Summarize the passage by tracing WHERE the interpretive field opens, WHO is being formed, and WHAT faithful discernment or practice follows today.",
+      "completed": "Completed responses",
+      "total": "Total fields",
+      "saved": "Autosaved",
+      "exportDone": "Your notes have been downloaded.",
+      "resetConfirm": "Reset all saved notes for this app?"
+    }
+  },
+  "ko": {
+    "brandTitle": "성서해석학 — 9주차 액티브 러닝 앱",
+    "brandSub": "GEK20070-01 · Fee & Stuart + Osborne · 학생용 수업 중 학습",
+    "heroEyebrow": "9주차 액티브 러닝 · BH_W6 구조",
+    "heroTitle": "복음서, 탄식, 그리고 상호본문적 해석",
+    "heroText": "이 9주차 수업용 앱은 Fee & Stuart + Osborne 종합 원고를 협력적 해석 활동으로 전환합니다. 학생들은 화요일에 세 개의 핵심 본문, 금요일에 세 개의 핵심 본문을 다룹니다. 각 본문에는 정확히 하나의 주해 질문과 하나의 해석학 질문만 있으며, 역사적·문학적·문화적 맥락, 학생 안내 질문, 자동 저장 노트, 최종 그룹 종합 문장이 포함됩니다.",
+    "tabs": {
+      "overview": "개요",
+      "tuesday": "화요일",
+      "friday": "금요일",
+      "workspace": "공동 작업"
+    },
+    "overview": {
+      "flowTitle": "수업에서 이 앱을 사용하는 방법",
+      "flowSub": "본문 관찰에서 책임 있는 해석학적 형성으로 이동하는 학생용 화/금 학습 흐름",
+      "flowItems": [
+        [
+          "1단계",
+          "배정된 핵심 본문을 그룹 안에서 소리 내어 읽고, 적용으로 바로 가지 말고 역사적·문학적·문화적 단서를 먼저 확인합니다."
+        ],
+        [
+          "2단계",
+          "먼저 하나의 주해 질문에 답합니다. 본문 세계 안에 머물며 두 수준 복음서 읽기, 내러티브 비평, 히브리 시, 상호본문적 읽기 등 원고가 제시한 방법을 사용합니다."
+        ],
+        [
+          "3단계",
+          "그다음 하나의 해석학 질문에 답합니다. 본문의 형식을 우회하지 않고, 본문 의미에서 공동체 형성으로 이동합니다."
+        ],
+        [
+          "4단계",
+          "해석의 장이 어디서 열리는지, 누가 형성되는지, 어떤 신실한 실천이 따르는지를 WHERE–WHO–WHAT으로 묶어 한 문장의 그룹 종합을 작성합니다."
+        ]
+      ],
+      "rightTitle": "수업 구성",
+      "rightSub": "화요일 핵심 본문 3개, 금요일 핵심 본문 3개",
+      "day1": "화요일 본문: 누가복음 15:1–2; 누가복음 15:11–24; 누가복음 15:25–32",
+      "day2": "금요일 본문: 시편 22:1–11; 시편 22:12–24; 마가복음 15:33–39",
+      "note": "학생 입력 내용은 이 브라우저에 자동 저장됩니다. 수업이 끝날 때 백업이 필요하면 ‘노트 내보내기’를 누르세요.",
+      "toolsTitle": "각 본문 카드에 들어 있는 요소",
+      "tools": [
+        [
+          "역사적 맥락",
+          "책임 있는 읽기에 필요한 공동체, 언약, 사회적 상황을 정리합니다."
+        ],
+        [
+          "문학적 맥락",
+          "서사 프레임, 플롯, 암시된 독자, 평행법, 탄식 구조, 상호본문적 인용을 살핍니다."
+        ],
+        [
+          "문화적 맥락",
+          "식탁 교제, 명예/수치, 상속, 탄식, 공동체 고난, 제국, 공적 증언 등을 본문에 맞게 고려합니다."
+        ],
+        [
+          "주해 질문 1개",
+          "오늘의 가정을 넣기 전에 먼저 본문 세계 안에 머물게 하는 질문입니다."
+        ],
+        [
+          "해석학 질문 1개",
+          "본문의 주장을 공동체 형성과 몸으로 드러나는 분별로 연결하는 질문입니다."
+        ]
+      ],
+      "progressTitle": "수업 진행도",
+      "progressSub": "학생이 입력하면 자동으로 갱신됩니다.",
+      "buttons": {
+        "export": "노트 내보내기",
+        "reset": "전체 노트 초기화"
+      }
+    },
+    "workspace": {
+      "title": "공동 작업 공간",
+      "sub": "최종 종합, 전체 발표, 혹은 교수 마무리 정리에 사용하세요.",
+      "prompt1": "누가복음 15장, 시편 22편, 마가복음 15장을 함께 볼 때, 선포의 논리와 임재의 논리는 왜 서로를 필요로 합니까?",
+      "prompt2": "여러분 그룹은 ‘형식이 의미를 운반한다’는 주장을 어느 본문에서 가장 분명하게 보았습니까?",
+      "prompt3": "Fee & Stuart의 두 수준 방법과 Osborne의 내러티브 형식, 탄식, 암시된 독자에 대한 주의를 함께 붙든다면 어떤 해석 실천이 달라져야 합니까?"
+    },
+    "footer": "BH_W6 학생용 구조를 사용하여 제작한 9주차 수업 중 액티브 러닝 앱입니다. 초기화하거나 저장소를 지우지 않는 한 노트는 이 브라우저에 남아 있습니다.",
+    "labels": {
+      "workflowExe": "주해",
+      "workflowHer": "해석학",
+      "workflowInt": "통합",
+      "historical": "역사적 맥락",
+      "literary": "문학적 맥락",
+      "cultural": "문화적 맥락",
+      "exe": "주해 질문",
+      "her": "해석학 질문",
+      "answer": "학생 노트",
+      "guide": "토의 단서",
+      "integration": "통합 / 그룹 종합",
+      "integrationPrompt": "해석의 장이 어디서 열리는지, 누가 형성되는지, 그리고 오늘 어떤 신실한 분별과 실천이 따라야 하는지를 요약하세요.",
+      "completed": "작성 완료 항목",
+      "total": "전체 입력 칸",
+      "saved": "자동 저장",
+      "exportDone": "노트 파일이 다운로드되었습니다.",
+      "resetConfirm": "이 앱의 저장된 노트를 모두 초기화할까요?"
+    }
+  }
+};
+
+const texts = {
+  "tuesday": [
+    {
+      "id": "lk15_frame",
+      "ref": {
+        "en": "Luke 15:1–2",
+        "ko": "누가복음 15:1–2"
+      },
+      "title": {
+        "en": "The Table Frame: Sinners, Pharisees, and the Question of Belonging",
+        "ko": "식탁 프레임: 죄인들, 바리새인들, 그리고 소속의 질문"
+      },
+      "desc": {
+        "en": "The opening frame positions Jesus' meal fellowship as the interpretive crisis for all three parables in Luke 15.",
+        "ko": "시작 프레임은 예수의 식탁 교제를 누가복음 15장 전체 비유들의 해석학적 위기로 위치시킵니다."
+      },
+      "historical": {
+        "en": "Luke writes for communities learning how Jesus' kingdom proclamation reshapes boundary-making, meal fellowship, and the reception of sinners within the people of God.",
+        "ko": "누가는 예수의 하나님 나라 선포가 경계 만들기, 식탁 교제, 죄인들의 수용을 어떻게 재구성하는지 배워야 하는 공동체를 향해 씁니다."
+      },
+      "literary": {
+        "en": "Before the parable begins, Luke gives the reader a conflict scene: tax collectors and sinners draw near, while Pharisees and scribes grumble. The frame tells us how to read the story that follows.",
+        "ko": "비유가 시작되기 전에 누가는 갈등 장면을 제시합니다. 세리와 죄인들은 가까이 오고, 바리새인과 서기관들은 수군거립니다. 이 프레임이 이어지는 이야기를 읽는 방식을 결정합니다."
+      },
+      "cultural": {
+        "en": "Meal fellowship signals recognition, status, and social belonging. Grumbling exposes not merely private irritation but a contested economy of holiness and inclusion.",
+        "ko": "식탁 교제는 인정, 지위, 사회적 소속을 나타냅니다. 수군거림은 개인적 불편함이 아니라 거룩함과 포용의 경제가 충돌하고 있음을 드러냅니다."
+      },
+      "questions": [
+        {
+          "type": "exe",
+          "focus": {
+            "en": "Narrative frame + implied reader",
+            "ko": "서사 프레임 + 암시된 독자"
+          },
+          "q": {
+            "en": "How does Luke 15:1–2 position the reader before the parable begins, and why is this frame essential for Fee & Stuart's two-level Gospel reading?",
+            "ko": "누가복음 15:1–2는 비유가 시작되기 전에 독자를 어떻게 위치시키며, 이 프레임은 Fee & Stuart의 두 수준 복음서 읽기에 왜 필수적입니까?"
+          },
+          "guide": {
+            "en": "Identify the two groups, the action of drawing near, the grumbling, and the ecclesial question Luke's community must face.",
+            "ko": "두 집단, 가까이 오는 행동, 수군거림, 그리고 누가의 공동체가 직면해야 하는 교회적 질문을 확인하세요."
+          }
+        },
+        {
+          "type": "her",
+          "focus": {
+            "en": "Community boundary discernment",
+            "ko": "공동체 경계 분별"
+          },
+          "q": {
+            "en": "Where do communities today still grumble at the table, and how does this frame challenge our inherited criteria for belonging?",
+            "ko": "오늘의 공동체는 어디에서 여전히 식탁 앞에서 수군거리며, 이 프레임은 우리가 물려받은 소속 기준에 어떻게 도전합니까?"
+          },
+          "guide": {
+            "en": "Move from ancient meal fellowship to present practices of welcome, suspicion, purity, exclusion, and restoration.",
+            "ko": "고대의 식탁 교제에서 오늘의 환대, 의심, 정결성, 배제, 회복의 실천으로 이동하세요."
+          }
+        }
+      ]
+    },
+    {
+      "id": "lk15_younger",
+      "ref": {
+        "en": "Luke 15:11–24",
+        "ko": "누가복음 15:11–24"
+      },
+      "title": {
+        "en": "The Younger Son and the Father's Prior Grace",
+        "ko": "작은아들과 아버지의 선행하는 은혜"
+      },
+      "desc": {
+        "en": "This scene dramatizes loss, return, prepared speech, interrupted confession, and the father's restoration before merit can be negotiated.",
+        "ko": "이 장면은 상실, 귀환, 준비된 말, 중단된 고백, 그리고 공로가 협상되기 전에 일어나는 아버지의 회복을 극적으로 보여 줍니다."
+      },
+      "historical": {
+        "en": "In the world of family honor and inheritance, the younger son's demand is socially devastating; his return exposes shame, survival, and the fragile hope of reception.",
+        "ko": "가족 명예와 상속의 세계에서 작은아들의 요구는 사회적으로 파괴적입니다. 그의 귀환은 수치, 생존, 그리고 받아들여질 수 있을지에 대한 불안정한 희망을 드러냅니다."
+      },
+      "literary": {
+        "en": "The plot turns when the father sees, runs, embraces, and restores. The son's prepared speech is not allowed to control the restoration scene.",
+        "ko": "플롯은 아버지가 보고, 달려가고, 안고, 회복시키는 순간 전환됩니다. 아들의 준비된 말은 회복 장면을 지배하지 못합니다."
+      },
+      "cultural": {
+        "en": "Robe, ring, sandals, and feast are public signs of restored status. The father relocates the son from shame to household belonging.",
+        "ko": "옷, 반지, 신발, 잔치는 회복된 지위의 공적 표지입니다. 아버지는 아들을 수치에서 가족 소속으로 이동시킵니다."
+      },
+      "questions": [
+        {
+          "type": "exe",
+          "focus": {
+            "en": "Plot reversal + grace before ethics",
+            "ko": "플롯 반전 + 윤리보다 앞서는 은혜"
+          },
+          "q": {
+            "en": "How does the father's interruption of the son's prepared speech reveal the parable's logic of grace before ethical repair?",
+            "ko": "아들의 준비된 말을 아버지가 중단시키는 장면은 윤리적 회복보다 앞서는 은혜의 논리를 어떻게 드러냅니까?"
+          },
+          "guide": {
+            "en": "Trace the order: seeing, compassion, running, embrace, speech, restoration, feast. Do not begin with moral application.",
+            "ko": "보는 것, 불쌍히 여김, 달려감, 안음, 말, 회복, 잔치의 순서를 추적하세요. 도덕적 적용에서 시작하지 마세요."
+          }
+        },
+        {
+          "type": "her",
+          "focus": {
+            "en": "Proclamation-logic",
+            "ko": "선포의 논리"
+          },
+          "q": {
+            "en": "How can a community announce restoration without making the wounded or returning person finish a prepared speech before receiving belonging?",
+            "ko": "공동체는 상처 입었거나 돌아오는 사람이 소속을 받기 전에 준비된 말을 끝내도록 요구하지 않으면서 어떻게 회복을 선포할 수 있습니까?"
+          },
+          "guide": {
+            "en": "Consider confession, accountability, shame, restoration, and the danger of making belonging conditional on performance.",
+            "ko": "고백, 책임, 수치, 회복, 그리고 소속을 수행 조건으로 만드는 위험을 함께 생각하세요."
+          }
+        }
+      ]
+    },
+    {
+      "id": "lk15_older",
+      "ref": {
+        "en": "Luke 15:25–32",
+        "ko": "누가복음 15:25–32"
+      },
+      "title": {
+        "en": "The Older Son, Merit-Logic, and the Open Door",
+        "ko": "큰아들, 공로 논리, 그리고 열린 문"
+      },
+      "desc": {
+        "en": "The final scene shifts attention to the obedient insider whose resentment reveals a competing economy of belonging.",
+        "ko": "마지막 장면은 순종하는 내부자에게 초점을 옮기며, 그의 분노는 소속에 대한 경쟁적 경제를 드러냅니다."
+      },
+      "historical": {
+        "en": "Luke's ecclesial level presses communities to ask how insiders respond when grace is extended to those they consider disqualified.",
+        "ko": "누가의 교회적 수준은 내부자들이 자격 없다고 여긴 이들에게 은혜가 확장될 때 어떻게 반응하는지를 묻게 합니다."
+      },
+      "literary": {
+        "en": "The parable ends unresolved. The father comes out again, but the older son's final response is withheld, leaving the reader at the doorway.",
+        "ko": "비유는 미해결 상태로 끝납니다. 아버지는 다시 밖으로 나가지만, 큰아들의 최종 응답은 제시되지 않아 독자를 문간에 세웁니다."
+      },
+      "cultural": {
+        "en": "Service, inheritance, honor, resentment, and public celebration collide. The elder brother speaks like a servant, not like a son who shares the household.",
+        "ko": "봉사, 상속, 명예, 분노, 공적 잔치가 충돌합니다. 큰아들은 집을 함께 누리는 아들이 아니라 종처럼 말합니다."
+      },
+      "questions": [
+        {
+          "type": "exe",
+          "focus": {
+            "en": "Open ending + reader placement",
+            "ko": "열린 결말 + 독자 위치"
+          },
+          "q": {
+            "en": "How does the unresolved ending place the reader in the older son's position and force a decision about the father's economy of belonging?",
+            "ko": "미해결 결말은 독자를 어떻게 큰아들의 위치에 세우며, 아버지의 소속 경제에 대한 결정을 요구합니까?"
+          },
+          "guide": {
+            "en": "Watch the older son's language: service, command, resentment, distancing, and refusal to enter the feast.",
+            "ko": "큰아들의 언어를 보세요. 봉사, 명령, 분노, 거리두기, 잔치에 들어가기를 거부하는 태도입니다."
+          }
+        },
+        {
+          "type": "her",
+          "focus": {
+            "en": "Formation against merit-logic",
+            "ko": "공로 논리에 저항하는 형성"
+          },
+          "q": {
+            "en": "What practices would help a church or classroom recognize older-son resentment before it closes the door against restored people?",
+            "ko": "교회나 교실이 회복된 사람들에게 문을 닫기 전에 큰아들의 분노를 알아차리도록 돕는 실천은 무엇입니까?"
+          },
+          "guide": {
+            "en": "Bridge from the parable's doorway to present patterns of resentment, gatekeeping, comparison, and restored belonging.",
+            "ko": "비유의 문간에서 오늘의 분노, 문지기 역할, 비교, 회복된 소속의 패턴으로 연결하세요."
+          }
+        }
+      ]
+    }
+  ],
+  "friday": [
+    {
+      "id": "ps22_lament",
+      "ref": {
+        "en": "Psalm 22:1–11",
+        "ko": "시편 22:1–11"
+      },
+      "title": {
+        "en": "Lament as Covenant Address: ‘My God’ in Experienced Abandonment",
+        "ko": "언약적 부름으로서의 탄식: 경험된 버림받음 속의 ‘나의 하나님’"
+      },
+      "desc": {
+        "en": "The opening movement of Psalm 22 holds covenant address and abandonment together without resolving the tension too quickly.",
+        "ko": "시편 22편의 시작 부분은 언약적 부름과 버림받음의 경험을 너무 빨리 해결하지 않고 함께 붙듭니다."
+      },
+      "historical": {
+        "en": "Psalmic lament gives Israel language to pray from distress while remaining inside covenant address. The speaker cries from abandonment without leaving God.",
+        "ko": "시편의 탄식은 이스라엘이 고통 속에서도 언약적 부름 안에서 기도할 수 있는 언어를 제공합니다. 화자는 버림받음 속에서 외치지만 하나님을 떠나지 않습니다."
+      },
+      "literary": {
+        "en": "The poem alternates between complaint, remembrance, and petition. ‘My God’ and ‘why’ create a form in which faith and dereliction are held together.",
+        "ko": "이 시는 탄식, 기억, 간구 사이를 오갑니다. ‘나의 하나님’과 ‘어찌하여’는 믿음과 버림받음이 함께 붙들리는 형식을 만듭니다."
+      },
+      "cultural": {
+        "en": "Public shame, mockery, trust, and covenant memory shape the lament. The sufferer is not merely private but exposed before others.",
+        "ko": "공적 수치, 조롱, 신뢰, 언약 기억이 이 탄식을 형성합니다. 고난받는 이는 단지 개인적으로 아픈 것이 아니라 다른 이들 앞에 노출되어 있습니다."
+      },
+      "questions": [
+        {
+          "type": "exe",
+          "focus": {
+            "en": "Hebrew poetry + lament form",
+            "ko": "히브리 시 + 탄식 형식"
+          },
+          "q": {
+            "en": "How does Psalm 22:1–11 use the form of lament to hold covenant address and experienced abandonment together?",
+            "ko": "시편 22:1–11은 탄식의 형식을 사용하여 언약적 부름과 경험된 버림받음을 어떻게 함께 붙듭니까?"
+          },
+          "guide": {
+            "en": "Attend to address, complaint, remembrance, mockery, trust, and petition as movements within one faithful lament.",
+            "ko": "부름, 탄식, 기억, 조롱, 신뢰, 간구가 하나의 신실한 탄식 안에서 어떻게 움직이는지 살피세요."
+          }
+        },
+        {
+          "type": "her",
+          "focus": {
+            "en": "Presence-logic",
+            "ko": "임재의 논리"
+          },
+          "q": {
+            "en": "How can a community remain present with those still in verse 1 without forcing them prematurely into resolution?",
+            "ko": "공동체는 아직 1절 안에 있는 사람들을 너무 빨리 해결로 몰아넣지 않고 어떻게 함께 머물 수 있습니까?"
+          },
+          "guide": {
+            "en": "Move from lament form to pastoral practice: listening, naming, waiting, and refusing premature closure.",
+            "ko": "탄식 형식에서 목회적 실천으로 이동하세요. 듣기, 이름 붙이기, 기다리기, 섣부른 종결 거부입니다."
+          }
+        }
+      ]
+    },
+    {
+      "id": "ps22_turn",
+      "ref": {
+        "en": "Psalm 22:12–24",
+        "ko": "시편 22:12–24"
+      },
+      "title": {
+        "en": "From Surrounding Threat to Testimony: The Pace of Lament",
+        "ko": "둘러싼 위협에서 증언으로: 탄식의 속도"
+      },
+      "desc": {
+        "en": "The lament intensifies through violent imagery and then turns toward testimony, praise, and the claim that God has not despised the afflicted one.",
+        "ko": "탄식은 폭력적 이미지 속에서 심화되다가, 하나님이 고난받는 자를 멸시하지 않으셨다는 증언과 찬양으로 전환됩니다."
+      },
+      "historical": {
+        "en": "Lament psalms often move from distress toward praise, but the movement happens through the form itself rather than through denial of suffering.",
+        "ko": "탄식시는 종종 고통에서 찬양으로 이동하지만, 그 이동은 고난의 부정을 통해서가 아니라 탄식 형식 자체를 통해 일어납니다."
+      },
+      "literary": {
+        "en": "Animal imagery, bodily dissolution, petition, and praise create a progression. Verse 24 is not a shortcut; it is reached through the poem's own pace.",
+        "ko": "동물 이미지, 몸의 해체, 간구, 찬양이 진행을 만듭니다. 24절은 지름길이 아니라 시 자체의 속도를 통해 도달하는 자리입니다."
+      },
+      "cultural": {
+        "en": "The sufferer's body and honor are attacked publicly. Praise becomes communal testimony after the lament has been truthfully voiced.",
+        "ko": "고난받는 이의 몸과 명예는 공개적으로 공격받습니다. 찬양은 탄식이 진실하게 발화된 뒤 공동체적 증언이 됩니다."
+      },
+      "questions": [
+        {
+          "type": "exe",
+          "focus": {
+            "en": "Poetic movement + testimony",
+            "ko": "시적 이동 + 증언"
+          },
+          "q": {
+            "en": "How does Psalm 22:12–24 move from surrounding threat to communal testimony without erasing the reality of suffering?",
+            "ko": "시편 22:12–24는 고난의 현실을 지우지 않으면서 둘러싼 위협에서 공동체적 증언으로 어떻게 이동합니까?"
+          },
+          "guide": {
+            "en": "Follow the sequence of threat imagery, bodily language, pleas for nearness, and the turn to public praise.",
+            "ko": "위협 이미지, 몸의 언어, 가까이 와 달라는 간구, 공적 찬양으로의 전환 순서를 따라가세요."
+          }
+        },
+        {
+          "type": "her",
+          "focus": {
+            "en": "Lament and communal care",
+            "ko": "탄식과 공동체 돌봄"
+          },
+          "q": {
+            "en": "What would it mean for a community to let sufferers move from verse 1 to verse 24 at the pace the lament itself sets?",
+            "ko": "공동체가 고난받는 이들이 탄식 자체가 정한 속도로 1절에서 24절로 이동하도록 허용한다는 것은 무엇을 의미합니까?"
+          },
+          "guide": {
+            "en": "Consider worship, counseling, classroom discussion, and testimony practices that honor the form of lament.",
+            "ko": "예배, 상담, 교실 토론, 간증의 실천이 탄식의 형식을 어떻게 존중할 수 있는지 생각하세요."
+          }
+        }
+      ]
+    },
+    {
+      "id": "mk15_ps22",
+      "ref": {
+        "en": "Mark 15:33–39",
+        "ko": "마가복음 15:33–39"
+      },
+      "title": {
+        "en": "Mark's Crucifixion Scene and Psalm 22 as Intertextual Lament",
+        "ko": "마가의 십자가 장면과 상호본문적 탄식으로서의 시편 22편"
+      },
+      "desc": {
+        "en": "Jesus' cry cites Psalm 22:1. Mark places the reader inside a scene where abandonment, irony, and confession converge at the cross.",
+        "ko": "예수의 외침은 시편 22:1을 인용합니다. 마가는 버림받음, 아이러니, 고백이 십자가에서 만나는 장면 안에 독자를 위치시킵니다."
+      },
+      "historical": {
+        "en": "Mark's community hears the crucifixion as a narrative of suffering, misunderstanding, and faithful witness under imperial violence.",
+        "ko": "마가의 공동체는 십자가를 제국의 폭력 아래 있는 고난, 오해, 신실한 증언의 이야기로 듣습니다."
+      },
+      "literary": {
+        "en": "Darkness, the cry of dereliction, bystanders' misunderstanding, the torn veil, and the centurion's confession form a tightly arranged narrative sequence.",
+        "ko": "어둠, 버림받음의 외침, 방관자들의 오해, 찢어진 휘장, 백부장의 고백은 치밀하게 배열된 서사 순서를 형성합니다."
+      },
+      "cultural": {
+        "en": "Crucifixion is public shame and imperial terror. Mark's intertextual use of Psalm 22 turns the cry into lament, covenant address, and narrative revelation.",
+        "ko": "십자가형은 공적 수치와 제국적 공포입니다. 마가의 시편 22편 사용은 그 외침을 탄식, 언약적 부름, 서사적 계시로 전환합니다."
+      },
+      "questions": [
+        {
+          "type": "exe",
+          "focus": {
+            "en": "Intertextual citation + narrative irony",
+            "ko": "상호본문적 인용 + 서사적 아이러니"
+          },
+          "q": {
+            "en": "How does Mark's use of Psalm 22:1 shape the meaning of Jesus' cry, and how does the scene position the implied reader differently from the bystanders?",
+            "ko": "마가의 시편 22:1 사용은 예수의 외침의 의미를 어떻게 형성하며, 이 장면은 암시된 독자를 방관자들과 어떻게 다르게 위치시킵니까?"
+          },
+          "guide": {
+            "en": "Read the cry as citation, lament, and narrative event. Notice misunderstanding, irony, the torn veil, and the centurion's confession.",
+            "ko": "그 외침을 인용, 탄식, 서사적 사건으로 읽으세요. 오해, 아이러니, 찢어진 휘장, 백부장의 고백을 주목하세요."
+          }
+        },
+        {
+          "type": "her",
+          "focus": {
+            "en": "Proclamation and presence together",
+            "ko": "선포와 임재의 결합"
+          },
+          "q": {
+            "en": "How does Mark 15 teach us to proclaim covenant hope while remaining present to real dereliction and suffering?",
+            "ko": "마가복음 15장은 실제 버림받음과 고난에 함께 머물면서도 언약적 소망을 선포하는 법을 어떻게 가르칩니까?"
+          },
+          "guide": {
+            "en": "Hold Fee & Stuart's proclamation-logic with Osborne's presence-logic: do not reduce the cross to a slogan or lament to despair.",
+            "ko": "Fee & Stuart의 선포 논리와 Osborne의 임재 논리를 함께 붙드세요. 십자가를 구호로, 탄식을 절망으로 축소하지 마세요."
+          }
+        }
+      ]
+    }
+  ]
+};
+
+const guideData = {
+  "lk15_frame": {
+    "tension": {
+      "en": "Jesus' receiving table versus insider grumbling",
+      "ko": "예수의 받아들이는 식탁과 내부자의 수군거림"
+    },
+    "shortcut": {
+      "en": "reading the parable as a timeless moral tale while ignoring the conflict frame that creates its force",
+      "ko": "비유의 힘을 만드는 갈등 프레임을 무시한 채 시대를 초월한 도덕 이야기로 읽는 것"
+    },
+    "strange": {
+      "en": "What unsettles you first: sinners drawing near, Jesus receiving them, or religious insiders grumbling?",
+      "ko": "무엇이 먼저 불편하게 다가옵니까: 죄인들이 가까이 오는 것, 예수께서 그들을 받아들이는 것, 아니면 종교적 내부자들의 수군거림입니까?"
+    },
+    "source": {
+      "en": "When you define who belongs, are your criteria coming from the narrative frame, church habit, institutional safety, or cultural suspicion?",
+      "ko": "누가 속할 수 있는지를 정의할 때, 당신의 기준은 서사 프레임에서 옵니까, 교회 습관에서 옵니까, 제도적 안전에서 옵니까, 문화적 의심에서 옵니까?"
+    },
+    "output": {
+      "en": "State in one sentence how Luke's opening frame prepares us to read the whole parable.",
+      "ko": "누가의 시작 프레임이 전체 비유를 읽도록 우리를 어떻게 준비시키는지 한 문장으로 말하세요."
+    }
+  },
+  "lk15_younger": {
+    "tension": {
+      "en": "prepared confession versus prior restoration",
+      "ko": "준비된 고백과 선행하는 회복"
+    },
+    "shortcut": {
+      "en": "turning the younger son into the main moral example instead of noticing the father's interrupting grace",
+      "ko": "아버지의 중단시키는 은혜를 보지 못하고 작은아들을 주된 도덕적 사례로 만드는 것"
+    },
+    "strange": {
+      "en": "What first surprises you: the son's planned speech, the father's running, or the restoration signs before negotiation?",
+      "ko": "무엇이 먼저 놀랍습니까: 아들의 계획된 말, 아버지가 달려가는 것, 아니면 협상 이전의 회복 표지들입니까?"
+    },
+    "source": {
+      "en": "When you say ‘repentance,’ ‘grace,’ or ‘restoration,’ which part is grounded in the plot order and which part comes from later vocabulary?",
+      "ko": "‘회개’, ‘은혜’, ‘회복’을 말할 때, 어떤 부분은 플롯 순서에 근거하고 어떤 부분은 후대의 어휘에서 옵니까?"
+    },
+    "output": {
+      "en": "State in one sentence how Luke 15:11–24 shows grace preceding ethics without eliminating transformation.",
+      "ko": "누가복음 15:11–24가 변화를 제거하지 않으면서도 윤리보다 앞서는 은혜를 어떻게 보여 주는지 한 문장으로 말하세요."
+    }
+  },
+  "lk15_older": {
+    "tension": {
+      "en": "household belonging versus merit accounting",
+      "ko": "가족 소속과 공로 계산"
+    },
+    "shortcut": {
+      "en": "condemning the older son too quickly instead of recognizing how the parable makes the reader stand with him at the doorway",
+      "ko": "비유가 독자를 문간에서 큰아들과 함께 서게 만든다는 점을 보지 않고 너무 빨리 큰아들을 정죄하는 것"
+    },
+    "strange": {
+      "en": "What first catches you: the older son's anger, his refusal to enter, or the father's second movement outward?",
+      "ko": "무엇이 먼저 눈에 들어옵니까: 큰아들의 분노, 들어가기를 거부하는 태도, 아니면 아버지의 두 번째 밖으로 나감입니까?"
+    },
+    "source": {
+      "en": "When you identify ‘fairness’ or ‘justice’ in this scene, are you using the older son's economy or the father's economy?",
+      "ko": "이 장면에서 ‘공정함’이나 ‘정의’를 말할 때, 당신은 큰아들의 경제를 사용합니까, 아니면 아버지의 경제를 사용합니까?"
+    },
+    "output": {
+      "en": "State in one sentence what the open ending asks of the reader.",
+      "ko": "열린 결말이 독자에게 무엇을 요구하는지 한 문장으로 말하세요."
+    }
+  },
+  "ps22_lament": {
+    "tension": {
+      "en": "covenant address inside experienced abandonment",
+      "ko": "경험된 버림받음 속의 언약적 부름"
+    },
+    "shortcut": {
+      "en": "rushing from pain to praise before inhabiting the lament form",
+      "ko": "탄식 형식 안에 충분히 머물기 전에 고통에서 찬양으로 서둘러 이동하는 것"
+    },
+    "strange": {
+      "en": "What is hardest to hold together: ‘My God’ and ‘why,’ faith and forsakenness, or memory and present silence?",
+      "ko": "함께 붙들기 가장 어려운 것은 무엇입니까: ‘나의 하나님’과 ‘어찌하여’, 믿음과 버림받음, 기억과 현재의 침묵입니까?"
+    },
+    "source": {
+      "en": "When you interpret lament, do your words come from the psalm's structure or from discomfort with unresolved pain?",
+      "ko": "탄식을 해석할 때, 당신의 말은 시편의 구조에서 옵니까, 아니면 해결되지 않은 고통에 대한 불편함에서 옵니까?"
+    },
+    "output": {
+      "en": "State in one sentence why the cry of abandonment is not the collapse of faith in Psalm 22.",
+      "ko": "시편 22편에서 버림받음의 외침이 왜 믿음의 붕괴가 아닌지 한 문장으로 말하세요."
+    }
+  },
+  "ps22_turn": {
+    "tension": {
+      "en": "truthful suffering moving toward public testimony",
+      "ko": "진실한 고난이 공적 증언으로 이동함"
+    },
+    "shortcut": {
+      "en": "using verse 24 to cancel verses 1–21 rather than arriving there through the poem's movement",
+      "ko": "시의 이동을 통해 24절에 도달하지 않고 24절로 1–21절을 취소하는 것"
+    },
+    "strange": {
+      "en": "What stays with you: the violent imagery, the plea for nearness, or the final testimony that God has not despised the afflicted?",
+      "ko": "무엇이 남습니까: 폭력적 이미지, 가까이 와 달라는 간구, 아니면 하나님이 고난받는 자를 멸시하지 않으셨다는 마지막 증언입니까?"
+    },
+    "source": {
+      "en": "When you speak of hope, are you honoring the whole lament or skipping the painful middle?",
+      "ko": "소망을 말할 때, 당신은 탄식 전체를 존중하고 있습니까, 아니면 고통스러운 중간 과정을 건너뛰고 있습니까?"
+    },
+    "output": {
+      "en": "State in one sentence how Psalm 22 moves toward praise without denying suffering.",
+      "ko": "시편 22편이 고난을 부정하지 않으면서 어떻게 찬양으로 이동하는지 한 문장으로 말하세요."
+    }
+  },
+  "mk15_ps22": {
+    "tension": {
+      "en": "dereliction as both real suffering and covenantal citation",
+      "ko": "실제 고난이자 언약적 인용인 버림받음"
+    },
+    "shortcut": {
+      "en": "treating Jesus' cry either as mere despair or as a proof-text detached from Mark's narrative scene",
+      "ko": "예수의 외침을 단순한 절망이나 마가의 서사 장면에서 분리된 증거구절로만 다루는 것"
+    },
+    "strange": {
+      "en": "What first confronts you: the darkness, the cry, the misunderstanding, the torn veil, or the centurion's confession?",
+      "ko": "무엇이 먼저 다가옵니까: 어둠, 외침, 오해, 찢어진 휘장, 아니면 백부장의 고백입니까?"
+    },
+    "source": {
+      "en": "When you interpret the cross, are you using Mark's narrative arrangement, Psalm 22's lament form, or later doctrinal shortcuts?",
+      "ko": "십자가를 해석할 때, 당신은 마가의 서사 배열, 시편 22편의 탄식 형식, 아니면 후대의 교리적 지름길을 사용하고 있습니까?"
+    },
+    "output": {
+      "en": "State in one sentence how Mark 15 uses Psalm 22 to hold proclamation and presence together.",
+      "ko": "마가복음 15장이 시편 22편을 사용하여 선포와 임재를 어떻게 함께 붙드는지 한 문장으로 말하세요."
+    }
+  }
+};
+
+let lang = 'en';
+const storePrefix = 'bh_w9_active_w6_structure_';
+const tabOrder = ['overview','tuesday','friday','workspace'];
+
+function t(path){
+  const parts = path.split('.');
+  let cur = ui[lang];
+  for (const p of parts) cur = cur[p];
+  return cur;
+}
+
+function buildTabs(){
+  const holder = document.getElementById('tabs');
+  holder.innerHTML = tabOrder.map(key => `<button class="tab-btn ${key==='overview'?'active':''}" data-tab="${key}">${ui[lang].tabs[key]}</button>`).join('');
+  holder.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click',()=>showTab(btn.dataset.tab)));
+}
+
+function showTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===`panel-${tab}`));
+}
+
+function buildOverview(){
+  const root = document.getElementById('panel-overview');
+  const o = ui[lang].overview;
+  root.innerHTML = `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head">
+          <div class="kicker">${lang==='en'?'Class workflow':'수업 흐름'}</div>
+          <h2 class="card-title">${o.flowTitle}</h2>
+        </div>
+        <div class="card-body mini-list">
+          ${o.flowItems.map(item=>`<div class="mini"><div class="mini-title">${item[0]}</div><div class="mini-desc">${item[1]}</div></div>`).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div class="kicker">${lang==='en'?'Session map':'세션 지도'}</div>
+            <h2 class="card-title">${o.rightTitle}</h2>
+          </div>
+          <div class="card-body">
+            <p>${o.day1}</p>
+            <p>${o.day2}</p>
+            <div class="note">${o.note}</div>
+            <div class="controls">
+              <button class="ctrl primary" id="exportBtn">${o.buttons.export}</button>
+              <button class="ctrl warn" id="resetBtn">${o.buttons.reset}</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="kicker">${lang==='en'?'Contents':'구성 요소'}</div>
+            <h2 class="card-title">${o.toolsTitle}</h2>
+          </div>
+          <div class="card-body mini-list">
+            ${o.tools.map(item=>`<div class="mini"><div class="mini-title">${item[0]}</div><div class="mini-desc">${item[1]}</div></div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-head">
+        <div class="kicker">${lang==='en'?'Live progress':'실시간 진행도'}</div>
+        <h2 class="card-title">${o.progressTitle}</h2>
+      </div>
+      <div class="card-body">
+        <p>${o.progressSub}</p>
+        <div class="progress-shell"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="stats">
+          <div class="stat"><div class="stat-num" id="statCompleted">0</div><div class="stat-label">${t('labels.completed')}</div></div>
+          <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">${t('labels.total')}</div></div>
+          <div class="stat"><div class="stat-num" id="statSaved">${lang==='en'?'Yes':'예'}</div><div class="stat-label">${t('labels.saved')}</div></div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('exportBtn').addEventListener('click', exportNotes);
+  document.getElementById('resetBtn').addEventListener('click', resetNotes);
+}
+
+function buildSession(panelId, arr, dayLabel){
+  const root = document.getElementById(`panel-${panelId}`);
+  const sessionTitle = lang==='en'
+    ? (panelId==='tuesday' ? 'Tuesday Core Texts' : 'Friday Core Texts')
+    : (panelId==='tuesday' ? '화요일 핵심 본문' : '금요일 핵심 본문');
+  const sessionDesc = lang==='en'
+    ? 'Choose one text below. Inside each text, open only the section your group is actively working on.'
+    : '아래에서 본문 하나를 선택하세요. 각 본문 안에서는 지금 그룹이 작업 중인 섹션만 열어 사용하세요.';
+  root.innerHTML = `
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-head">
+        <div class="kicker">${dayLabel}</div>
+        <h2 class="card-title">${sessionTitle}</h2>
+      </div>
+      <div class="card-body">
+        <p>${lang==='en' ? 'Move through the texts in order. Complete the exegetical section before turning to hermeneutics. Use the integration box at the end of each text for group summary.' : '본문을 순서대로 진행하세요. 먼저 주해 부분을 마친 뒤 해석학으로 이동하세요. 각 본문 끝의 통합 박스를 그룹 요약에 사용하세요.'}</p>
+      </div>
+    </div>
+
+    <div class="day-shell">
+      <div class="day-subtabs" data-day="${panelId}">
+        ${arr.map((item, idx) => `<button class="day-subtab ${idx===0?'active':''}" data-day="${panelId}" data-text="${item.id}">${item.ref[lang]}</button>`).join('')}
+      </div>
+      <p class="subtab-note">${sessionDesc}</p>
+      ${arr.map((item, idx) => `
+        <div class="day-subpanel ${idx===0?'active':''}" data-day-panel="${panelId}" data-text-panel="${item.id}">
+          ${renderTextCard(item)}
+        </div>
+      `).join('')}
+    </div>
+  `;
+  root.querySelectorAll('.day-subtab').forEach(btn=>{
+    btn.addEventListener('click', ()=>showDayText(panelId, btn.dataset.text));
+  });
+  attachAutosave(root);
+}
+
+
+function renderStudentGuide(item){
+  const gd = guideData[item.id];
+  const ko = lang==='ko';
+  return `
+      <div class="section-note">${ko?`${item.ref[lang]}을 읽기 전에, 그리고 답을 적는 동안, 자신의 읽기·주해·해석·산출 문장이 어떻게 형성되는지 보도록 돕는 학생용 안내층입니다.`:`This student-only guide helps you see how your reading, exegesis, interpretation, and final output sentence are forming while you work through ${item.ref[lang]}.`}</div>
+      <div class="sg-callout">
+        <div class="sg-label">${ko?'학생 output 점검':'Student Output Check'}</div>
+        <div class="sg-text">${ko?'마지막에는 세 가지를 말할 수 있어야 합니다: ① 이 본문이 실제로 무엇을 말하는가(주해), ② 그것이 지금 여기서 무엇을 요구하는가(해석), ③ 내가 그 결론에 어떻게 도달했는가(사고 과정).':'By the end you should be able to state three things: (1) what this passage is actually saying (exegesis), (2) what that means here and now (interpretation), and (3) how you arrived there (thinking process).'}</div>
+      </div>
+      <div class="sg-grid">
+        <div class="sg-box">
+          <div class="sg-label">${ko?'학습 흐름':'Learning Flow'}</div>
+          <div class="sg-pill-row">
+            <span class="sg-pill blue">${ko?'낯섦':'Strangeness'}</span>
+            <span class="sg-pill blue">${ko?'주해':'Exegesis'}</span>
+            <span class="sg-pill green">${ko?'해석':'Interpretation'}</span>
+            <span class="sg-pill purple">${ko?'통합':'Integration'}</span>
+          </div>
+          <ul class="sg-list">
+            <li>${ko?'먼저, 설명하기 전에 불편함·놀라움·저항이 어디서 생기는지 적으세요.':'First, note where discomfort, surprise, or resistance appears before you explain the passage away.'}</li>
+            <li>${ko?'그다음 역사·문학·문화 맥락을 사용해 본문 세계 안에서 주해 질문 하나에 답하세요.':'Then answer the exegetical question inside the text world using the historical, literary, and cultural frame.'}</li>
+            <li>${ko?'이후에만 해석학 질문 하나에 답하며 오늘의 공동체와 자기 삶으로 다리를 놓으세요.':'Only after that should you answer the hermeneutical question by bridging the passage toward your community and present life.'}</li>
+            <li>${ko?'마지막 통합 문장에서는 WHERE–WHO–WHAT을 한 문장으로 묶으세요.':'In the final synthesis sentence, hold together WHERE–WHO–WHAT in one statement.'}</li>
+          </ul>
+        </div>
+        <div class="sg-box">
+          <div class="sg-label">${ko?'읽기가 형성되는 과정':'How Your Reading Forms'}</div>
+          <div class="sg-box-title">${ko?'이 본문의 핵심 긴장':'Central Tension in This Text'}</div>
+          <div class="sg-text">${ko?gd.tension.ko:gd.tension.en}</div>
+          <div class="sg-box-title" style="margin-top:8px">${ko?'가장 흔한 지름길':'Most Common Shortcut'}</div>
+          <div class="sg-text">${ko?gd.shortcut.ko:gd.shortcut.en}</div>
+        </div>
+        <div class="sg-box">
+          <div class="sg-label">${ko?'설명 전 체크':'Before You Explain'}</div>
+          <div class="sg-text">${ko?gd.strange.ko:gd.strange.en}</div>
+          <textarea class="guide-answer save-field" data-key="${item.id}_prearticulate" placeholder="${ko?'설명하기 전에 먼저 떠오른 저항·낯섦·질문을 적으세요.':'Write the resistance, strangeness, or question that surfaced before your explanation.'}"></textarea>
+        </div>
+        <div class="sg-box">
+          <div class="sg-label">${ko?'내 읽기의 출처':'Where My Reading Came From'}</div>
+          <div class="sg-text">${ko?gd.source.ko:gd.source.en}</div>
+          <ul class="sg-list" style="margin-top:8px">
+            <li>${ko?'본문 자체':'The text itself'}</li>
+            <li>${ko?'교회/교리 언어':'Church / doctrinal language'}</li>
+            <li>${ko?'문화적 직관과 상식':'Cultural intuition and common sense'}</li>
+            <li>${ko?'AI 요약 또는 이전 학습':'AI summary or prior learning'}</li>
+          </ul>
+          <textarea class="guide-answer save-field" data-key="${item.id}_source_trace" placeholder="${ko?'내 문장을 형성한 가장 강한 출처를 적으세요.':'Name the strongest source shaping your sentence.'}"></textarea>
+        </div>
+        <div class="sg-box full">
+          <div class="sg-label">${ko?'한 문장 산출':'One-Sentence Output'}</div>
+          <div class="sg-text">${ko?gd.output.ko:gd.output.en}</div>
+          <textarea class="guide-answer save-field" data-key="${item.id}_output_sentence" placeholder="${ko?'주해+해석을 거친 뒤 최종 한 문장을 적으세요.':'After your exegesis and interpretation, write your final one-sentence claim.'}"></textarea>
+        </div>
+        <div class="sg-box">
+          <div class="sg-label">${ko?'성장 점검':'Growth Check'}</div>
+          <ul class="sg-list">
+            <li>${ko?'정답을 보기 전에 먼저 내 읽기 메모를 남겼는가?':'Did I record my own reading before looking for an answer?'}</li>
+            <li>${ko?'내 핵심어가 본문 언어인지 가져온 언어인지 구분했는가?':'Did I distinguish the text’s language from imported language?'}</li>
+            <li>${ko?'주해에서 해석으로 이동할 때 본문을 평면화하지 않았는가?':'Did I move from exegesis to interpretation without flattening the passage?'}</li>
+          </ul>
+        </div>
+        <div class="sg-box">
+          <div class="sg-label">${ko?'AI 멈춤 규칙':'When to Pause AI'}</div>
+          <ul class="sg-list">
+            <li>${ko?'낯섦 메모 전에는 AI에게 의미를 묻지 말 것':'Do not ask AI for meaning before you write your strangeness note.'}</li>
+            <li>${ko?'내 문장의 출처 명명을 AI에 맡기지 말 것':'Do not outsource source naming to AI.'}</li>
+            <li>${ko?'혼란을 즉시 AI로 봉합하지 말 것':'Do not use AI to seal over confusion too quickly.'}</li>
+            <li>${ko?'최종 한 문장을 AI가 먼저 써주게 하지 말 것':'Do not let AI write your final sentence first.'}</li>
+          </ul>
+        </div>
+      </div>`;
+}
+
+function renderTextCard(item){
+  const exeQuestions = item.questions.filter(q=>q.type==='exe').map((q,idx)=>renderQuestion(item.id, q, idx)).join('');
+  const herQuestions = item.questions.filter(q=>q.type==='her').map((q,idx)=>renderQuestion(item.id, q, idx+2)).join('');
+  const sectionTitles = lang==='ko'
+    ? {
+        contextKicker:'섹션 1', contextTitle:'맥락 + 학생 학습 경로', contextText:'먼저 본문 세계와 자신의 읽기 과정을 확인한 뒤 질문으로 들어가세요.',
+        exeKicker:'섹션 2', exeTitle:'주해 질문', exeText:'본문 안에 머물면서 역사·문학·문화 맥락을 사용해 답하세요.',
+        herKicker:'섹션 3', herTitle:'해석학 질문', herText:'주해를 마친 뒤에만 오늘의 공동체와 삶으로 다리를 놓으세요.',
+        intKicker:'섹션 4', intTitle:'통합 문장', intText:'WHERE–WHO–WHAT을 한 문장으로 묶어 최종 산출을 적으세요.'
+      }
+    : {
+        contextKicker:'Section 1', contextTitle:'Context + Student Learning Path', contextText:'Orient yourself in the text world and in your own reading process before moving into the questions.',
+        exeKicker:'Section 2', exeTitle:'Exegetical Question', exeText:'Stay inside the passage and use the historical, literary, and cultural context to answer.',
+        herKicker:'Section 3', herTitle:'Hermeneutical Question', herText:'Only after exegesis should you bridge the passage toward community and present life.',
+        intKicker:'Section 4', intTitle:'Integration Sentence', intText:'Hold together WHERE–WHO–WHAT in one final output sentence.'
+      };
+  return `
+    <article class="text-card">
+      <div class="text-top">
+        <div class="ref">${item.ref[lang]}</div>
+        <h3 class="text-title">${item.title[lang]}</h3>
+        <div class="text-desc">${item.desc[lang]}</div>
+      </div>
+      <div class="text-body">
+        <div class="toggle-stack">
+          <details class="toggle-section" open>
+            <summary>
+              <div>
+                <div class="toggle-kicker">${sectionTitles.contextKicker}</div>
+                <div class="toggle-title">${sectionTitles.contextTitle}</div>
+                <div class="toggle-summary-text">${sectionTitles.contextText}</div>
+              </div>
+              <div class="toggle-arrow">▾</div>
+            </summary>
+            <div class="toggle-body">
+              <div class="ctx-grid" style="margin:0 0 12px">
+                <div class="ctx"><div class="label">${t('labels.historical')}</div><div class="value">${item.historical[lang]}</div></div>
+                <div class="ctx"><div class="label">${t('labels.literary')}</div><div class="value">${item.literary[lang]}</div></div>
+                <div class="ctx"><div class="label">${t('labels.cultural')}</div><div class="value">${item.cultural[lang]}</div></div>
+              </div>
+              ${renderStudentGuide(item)}
+            </div>
+          </details>
+
+          <details class="toggle-section">
+            <summary>
+              <div>
+                <div class="toggle-kicker">${sectionTitles.exeKicker}</div>
+                <div class="toggle-title">${sectionTitles.exeTitle}</div>
+                <div class="toggle-summary-text">${sectionTitles.exeText}</div>
+              </div>
+              <div class="toggle-arrow">▾</div>
+            </summary>
+            <div class="toggle-body">
+              <div class="workflow" style="margin-bottom:10px">
+                <span class="step exe">1. ${t('labels.workflowExe')}</span>
+              </div>
+              ${exeQuestions}
+            </div>
+          </details>
+
+          <details class="toggle-section">
+            <summary>
+              <div>
+                <div class="toggle-kicker">${sectionTitles.herKicker}</div>
+                <div class="toggle-title">${sectionTitles.herTitle}</div>
+                <div class="toggle-summary-text">${sectionTitles.herText}</div>
+              </div>
+              <div class="toggle-arrow">▾</div>
+            </summary>
+            <div class="toggle-body">
+              <div class="workflow" style="margin-bottom:10px">
+                <span class="step her">2. ${t('labels.workflowHer')}</span>
+              </div>
+              ${herQuestions}
+            </div>
+          </details>
+
+          <details class="toggle-section">
+            <summary>
+              <div>
+                <div class="toggle-kicker">${sectionTitles.intKicker}</div>
+                <div class="toggle-title">${sectionTitles.intTitle}</div>
+                <div class="toggle-summary-text">${sectionTitles.intText}</div>
+              </div>
+              <div class="toggle-arrow">▾</div>
+            </summary>
+            <div class="toggle-body">
+              <div class="workflow" style="margin-bottom:10px">
+                <span class="step int">3. ${t('labels.workflowInt')}</span>
+              </div>
+              <div class="integration" style="margin-top:0">
+                <div class="ititle">${t('labels.integration')}</div>
+                <div class="qtext">${t('labels.integrationPrompt')}</div>
+                <textarea class="answer save-field" data-key="${item.id}_integration" placeholder="${t('labels.answer')}"></textarea>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderQuestion(id, q, idx){
+  const typeCls = q.type === 'exe' ? 'exe' : 'her';
+  return `
+    <div class="question">
+      <div class="qhead">
+        <div class="qtype ${typeCls}">${q.type === 'exe' ? t('labels.exe') : t('labels.her')}</div>
+        <div class="qfocus">${q.focus[lang]}</div>
+      </div>
+      <div class="qtext">${q.q[lang]}</div>
+      <div class="qguide"><strong>${t('labels.guide')}:</strong> ${q.guide[lang]}</div>
+      <textarea class="answer save-field" data-key="${id}_q${idx+1}" placeholder="${t('labels.answer')}"></textarea>
+    </div>
+  `;
+}
+
+function showDayText(day, textId){
+  const panel = document.getElementById(`panel-${day}`);
+  if(!panel) return;
+  panel.querySelectorAll('.day-subtab').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.text===textId);
+  });
+  panel.querySelectorAll('.day-subpanel').forEach(sub=>{
+    sub.classList.toggle('active', sub.dataset.textPanel===textId);
+  });
+}
+
+function buildWorkspace(){
+  const w = ui[lang].workspace;
+  document.getElementById('panel-workspace').innerHTML = `
+    <div class="card">
+      <div class="card-head">
+        <div class="kicker">${lang==='en'?'Plenary synthesis':'전체 종합'}</div>
+        <h2 class="card-title">${w.title}</h2>
+      </div>
+      <div class="card-body">
+        <p>${w.sub}</p>
+        <div class="question"><div class="qtext">1. ${w.prompt1}</div><textarea class="answer save-field" data-key="workspace_1" placeholder="${t('labels.answer')}"></textarea></div>
+        <div class="question"><div class="qtext">2. ${w.prompt2}</div><textarea class="answer save-field" data-key="workspace_2" placeholder="${t('labels.answer')}"></textarea></div>
+        <div class="question"><div class="qtext">3. ${w.prompt3}</div><textarea class="answer save-field" data-key="workspace_3" placeholder="${t('labels.answer')}"></textarea></div>
+      </div>
+    </div>
+  `;
+  attachAutosave(document.getElementById('panel-workspace'));
+}
+
+function attachAutosave(root){
+  root.querySelectorAll('.save-field').forEach(el=>{
+    const key = storePrefix + el.dataset.key;
+    el.value = localStorage.getItem(key) || '';
+    el.addEventListener('input', ()=>{
+      localStorage.setItem(key, el.value);
+      updateProgress();
+    });
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const fields = document.querySelectorAll('.save-field');
+  const total = fields.length;
+  let completed = 0;
+  fields.forEach(f=>{ if((f.value || '').trim()) completed++; });
+  const pct = total ? Math.round((completed/total)*100) : 0;
+  const bar = document.getElementById('progressBar');
+  const completedEl = document.getElementById('statCompleted');
+  const totalEl = document.getElementById('statTotal');
+  if(bar) bar.style.width = pct + '%';
+  if(completedEl) completedEl.textContent = completed;
+  if(totalEl) totalEl.textContent = total;
+}
+
+function exportNotes(){
+  const payload = [];
+  document.querySelectorAll('.save-field').forEach(el=>{
+    payload.push(`${el.dataset.key}\n${'-'.repeat(el.dataset.key.length)}\n${el.value || ''}\n`);
+  });
+  const blob = new Blob([payload.join('\n')], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `BH_Week9_active_notes_${lang}.txt`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  alert(t('labels.exportDone'));
+}
+
+function resetNotes(){
+  if(!confirm(t('labels.resetConfirm'))) return;
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith(storePrefix)) localStorage.removeItem(k); });
+  document.querySelectorAll('.save-field').forEach(el=>el.value='');
+  updateProgress();
+}
+
+function render(){
+  document.documentElement.lang = lang;
+  document.getElementById('brandTitle').textContent = ui[lang].brandTitle;
+  document.getElementById('brandSub').textContent = ui[lang].brandSub;
+  document.getElementById('heroEyebrow').textContent = ui[lang].heroEyebrow;
+  document.getElementById('heroTitle').textContent = ui[lang].heroTitle;
+  document.getElementById('heroText').textContent = ui[lang].heroText;
+  document.getElementById('footerNote').textContent = ui[lang].footer;
+  buildTabs();
+  buildOverview();
+  buildSession('tuesday', texts.tuesday, lang==='en' ? 'Tuesday' : '화요일');
+  buildSession('friday', texts.friday, lang==='en' ? 'Friday' : '금요일');
+  buildWorkspace();
+  const activePanel = document.querySelector('.panel.active')?.id?.replace('panel-','') || 'overview';
+  showTab(activePanel);
+  document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.toggle('active', btn.dataset.lang===lang));
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click', ()=>{ lang = btn.dataset.lang; render(); }));
+render();
+</script>
+</body>
+</html>
