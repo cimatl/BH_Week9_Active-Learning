@@ -170,15 +170,54 @@ textarea.guide-answer:focus{outline:2px solid rgba(42,74,138,.13);border-color:r
     <p id="heroText"></p>
   </section>
 
+
+  <section class="card" id="studentIdentityPanel" style="margin-bottom:18px">
+    <div class="card-head">
+      <div class="kicker" data-en="Submission Identity" data-ko="제출 정보">Submission Identity</div>
+      <h2 class="card-title" data-en="Student Information for Google Submission" data-ko="Google 제출을 위한 학생 정보">Student Information for Google Submission</h2>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <label style="display:block;font-weight:700;margin-bottom:6px" data-en="Student Name / ID" data-ko="학생 이름 / 학번">Student Name / ID</label>
+          <input id="studentName" placeholder="Name or student ID" oninput="saveBHIdentity()" />
+        </div>
+        <div>
+          <label style="display:block;font-weight:700;margin-bottom:6px" data-en="Group" data-ko="그룹">Group</label>
+          <input id="studentGroup" placeholder="e.g., BH-1A, Friday-2" oninput="saveBHIdentity()" />
+        </div>
+      </div>
+      <div class="note" id="submitStatus" style="margin-top:12px" data-en="Your answers autosave in this browser. Partial Google submission is allowed." data-ko="답변은 이 브라우저에 자동 저장됩니다. 부분 Google 제출이 가능합니다.">Your answers autosave in this browser. Partial Google submission is allowed.</div>
+    </div>
+  </section>
+
   <section class="panel active" id="panel-overview"></section>
   <section class="panel" id="panel-tuesday"></section>
   <section class="panel" id="panel-friday"></section>
   <section class="panel" id="panel-workspace"></section>
 
+  
+  <section class="card" id="googleSubmitPanel" style="margin-top:18px">
+    <div class="card-head">
+      <div class="kicker" data-en="Google Submission" data-ko="Google 제출">Google Submission</div>
+      <h2 class="card-title" data-en="Submit BH Week 9 Work" data-ko="BH 9주차 작업 제출">Submit BH Week 9 Work</h2>
+    </div>
+    <div class="card-body">
+      <p class="small" data-en="You may submit partially. Empty fields will be saved as blank cells." data-ko="부분 제출이 가능합니다. 비어 있는 칸은 빈 셀로 저장됩니다.">You may submit partially. Empty fields will be saved as blank cells.</p>
+      <div class="controls">
+        <button class="ctrl primary" onclick="submitBHCurrent()" data-en="Submit Current Text" data-ko="현재 본문 제출">Submit Current Text</button>
+        <button class="ctrl primary" onclick="submitBHAll()" data-en="Submit All Notes" data-ko="전체 노트 제출">Submit All Notes</button>
+        <button class="ctrl" onclick="exportNotes()" data-en="Export Backup JSON" data-ko="백업 JSON 내보내기">Export Backup JSON</button>
+      </div>
+    </div>
+  </section>
+
   <div class="footer-note" id="footerNote"></div>
 </main>
 
 <script>
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8dmp1okch04xnUwGwAHKYm_eL5ZlJ3guZfQhDvERy7r0DJNZk6QeObPOSowMCqy5U/exec";
+
 const ui = {
   "en": {
     "brandTitle": "Biblical Hermeneutics — Week 9 Active Learning App",
@@ -1280,6 +1319,151 @@ function render(){
 
 document.querySelectorAll('.lang-btn').forEach(btn=>btn.addEventListener('click', ()=>{ lang = btn.dataset.lang; render(); }));
 render();
+
+/* ===== BH Google Submission Layer ===== */
+function saveBHIdentity(){
+  const name = document.getElementById('studentName')?.value || '';
+  const group = document.getElementById('studentGroup')?.value || '';
+  localStorage.setItem('bh_w9_studentName', name);
+  localStorage.setItem('bh_w9_studentGroup', group);
+}
+function loadBHIdentity(){
+  const n = document.getElementById('studentName');
+  const g = document.getElementById('studentGroup');
+  if(n) n.value = localStorage.getItem('bh_w9_studentName') || '';
+  if(g) g.value = localStorage.getItem('bh_w9_studentGroup') || '';
+}
+function bhSetStatus(message, isError=false){
+  const box = document.getElementById('submitStatus');
+  if(!box) return;
+  box.textContent = message;
+  box.style.background = isError ? 'var(--redLite)' : 'var(--goldLite)';
+}
+function bhStorageValue(key){
+  try { return localStorage.getItem(storePrefix + key) || ''; } catch(e) { return ''; }
+}
+function flattenBHTexts(){ return [].concat(texts.tuesday || [], texts.friday || []); }
+function getCurrentBHTextId(){
+  const activeSub = document.querySelector('.day-subtab.active');
+  if(activeSub && activeSub.dataset.text) return activeSub.dataset.text;
+  const activePanel = document.querySelector('.day-subpanel.active');
+  if(activePanel && activePanel.dataset.textPanel) return activePanel.dataset.textPanel;
+  return (flattenBHTexts()[0] || {}).id || null;
+}
+function collectBHText(textId){
+  const item = flattenBHTexts().find(x => x.id === textId);
+  if(!item) return null;
+  const out = {
+    id: item.id,
+    ref: item.ref ? (item.ref[lang] || item.ref.en || '') : '',
+    title: item.title ? (item.title[lang] || item.title.en || '') : '',
+    day: (texts.tuesday || []).some(x => x.id === item.id) ? 'Tuesday' : 'Friday',
+    language: lang,
+    historical_context: item.historical ? (item.historical[lang] || item.historical.en || '') : '',
+    literary_context: item.literary ? (item.literary[lang] || item.literary.en || '') : '',
+    cultural_context: item.cultural ? (item.cultural[lang] || item.cultural.en || '') : ''
+  };
+
+  const keys = new Set();
+  document.querySelectorAll('[data-key]').forEach(node => {
+    const key = node.dataset.key;
+    if(key && key.startsWith(item.id + '_')) keys.add(key);
+  });
+  ['prearticulate','source_trace','output_sentence','integration','guide_final','group_synthesis'].forEach(s => keys.add(item.id + '_' + s));
+
+  keys.forEach(key => out[key.replace(item.id + '_','')] = bhStorageValue(key));
+
+  if(item.questions && item.questions.length){
+    item.questions.forEach((q, idx) => {
+      const qType = q.type || ('q'+idx);
+      out[qType + '_question'] = q.q ? (q.q[lang] || q.q.en || '') : '';
+      out[qType + '_guide'] = q.guide ? (q.guide[lang] || q.guide.en || '') : '';
+      out[qType + '_answer'] = bhStorageValue(item.id + '_' + qType + '_' + idx);
+    });
+  }
+  return out;
+}
+function buildBHPayload(mode, onlyTextId=null){
+  saveBHIdentity();
+  const selected = onlyTextId ? [collectBHText(onlyTextId)].filter(Boolean) : flattenBHTexts().map(t => collectBHText(t.id)).filter(Boolean);
+  return {
+    course: 'Biblical Hermeneutics',
+    week: 'Week 9',
+    app: 'BH Week 9 Active Learning App',
+    mode,
+    studentName: (document.getElementById('studentName')?.value || '').trim() || 'Anonymous / Not entered',
+    studentGroup: (document.getElementById('studentGroup')?.value || '').trim() || 'No group entered',
+    submittedAt: new Date().toISOString(),
+    language: lang,
+    source: window.location.href,
+    responses: selected
+  };
+}
+function submitBHPayload(payload){
+  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('PASTE_YOUR_BH_GOOGLE_APPS_SCRIPT_EXEC_URL_HERE')){
+    bhSetStatus(lang === 'ko'
+      ? '먼저 HTML 안의 GOOGLE_SCRIPT_URL에 BH Apps Script /exec URL을 붙여넣어야 합니다.'
+      : 'Paste your BH Apps Script /exec URL into GOOGLE_SCRIPT_URL first.', true);
+    return;
+  }
+  bhSetStatus(lang === 'ko' ? '제출 중입니다...' : 'Submitting...');
+  try {
+    const iframeName = 'bhSubmitFrame_' + Date.now();
+    const iframe = document.createElement('iframe');
+    iframe.name = iframeName;
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = GOOGLE_SCRIPT_URL;
+    form.target = iframeName;
+    form.style.display = 'none';
+
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    form.submit();
+
+    setTimeout(() => {
+      bhSetStatus(lang === 'ko'
+        ? '제출 요청을 보냈습니다. BH Google Sheet의 Submissions/Answers 탭을 확인하세요.'
+        : 'Submission request sent. Check the BH Google Sheet Submissions/Answers tabs.');
+      try { form.remove(); iframe.remove(); } catch(e) {}
+    }, 1200);
+  } catch(err) {
+    console.error(err);
+    bhSetStatus(lang === 'ko'
+      ? '제출 오류가 발생했습니다. Export Backup JSON을 사용하세요.'
+      : 'Submission error. Use Export Backup JSON as backup.', true);
+  }
+}
+function submitBHCurrent(){
+  const textId = getCurrentBHTextId();
+  if(!textId){
+    bhSetStatus(lang === 'ko' ? '현재 선택된 본문을 찾을 수 없습니다.' : 'Could not find current selected text.', true);
+    return;
+  }
+  submitBHPayload(buildBHPayload('current_text', textId));
+}
+function submitBHAll(){ submitBHPayload(buildBHPayload('all_texts')); }
+
+function updateStaticBilingualLabels(){
+  document.querySelectorAll('[data-en][data-ko]').forEach(node => {
+    node.textContent = lang === 'ko' ? node.dataset.ko : node.dataset.en;
+  });
+}
+window.addEventListener('DOMContentLoaded', () => {
+  loadBHIdentity();
+  updateStaticBilingualLabels();
+});
+setTimeout(() => { loadBHIdentity(); updateStaticBilingualLabels(); }, 200);
+document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setTimeout(updateStaticBilingualLabels, 80)));
+
 </script>
 </body>
 </html>
